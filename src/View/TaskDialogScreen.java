@@ -173,7 +173,7 @@ public class TaskDialogScreen extends JDialog {
 			public void mouseClicked(MouseEvent evt) {
 				try {
 					Task task = new Task();
-					task.setIdProject(2);
+					task.setIdProject(project.getId());
 					task.setName(jTextFieldName.getText());
 					task.setDescription(jTextAreaDescription.getText());
 					task.setNotes(jTextAreaNotes.getText());

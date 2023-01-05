@@ -39,7 +39,7 @@ public class taskController {
 	
 	public void update(Task task) {
 		
-		String sql = "UPDATE tasks SET idProject = ?, name = ?, description = ?, completed = ?, notes = ?, deadline = ?, creatAt = ?, updateAt = ?";
+		String sql = "UPDATE tasks SET idProject = ?, name = ?, description = ?, completed = ?, notes = ?, deadline = ?, creatAt = ?, updateAt = ? WHERE id = ?";
 		Connection connection = null;
 		PreparedStatement statement = null;
 		
@@ -67,7 +67,7 @@ public class taskController {
 		}
 	}
 	
-	public void removeById(int taskId) throws SQLException {
+	public void removeById(int taskId) {
 		
 		String sql = "DELETE FROM tasks WHERE id = ?";
 		Connection connection = null;
@@ -117,7 +117,7 @@ public class taskController {
 				task.setDescription(resultSet.getString("description"));
 				task.setNotes(resultSet.getString("notes"));
 				task.setCompleted(resultSet.getBoolean("completed"));
-				task.setDeadline(resultSet.getDate("deatline"));
+				task.setDeadline(resultSet.getDate("deadline"));
 				task.setCreatedAt(resultSet.getDate("creatAt"));
 				task.setUpdatedAt(resultSet.getDate("updateAt"));
 				

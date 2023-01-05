@@ -10,6 +10,7 @@ import javax.swing.GroupLayout.Alignment;
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
+
 import java.awt.Font;
 import javax.swing.ImageIcon;
 import java.awt.Dimension;
@@ -21,14 +22,18 @@ import javax.swing.DefaultListModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+
 import Controler.projectControler;
 import Controler.taskController;
 import Model.Project;
+import Model.Task;
+import util.TaskTableModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.util.List;
 
 public class MainScreen extends JFrame {
@@ -36,11 +41,16 @@ public class MainScreen extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTable jTableTasks;
+	private JScrollPane scrollPane;
+	private JList<Project> jListProjects;
+	private JPanel jPanelEmptyList;
+	private JPanel jPanel;
+	private JTabbedPane tabbedPane;
 	
 	projectControler projectController;
 	taskController taskController;
-	
-	DefaultListModel projectModel;
+	TaskTableModel taskModel;
+	DefaultListModel<Project> projectsModel;
 
 	/**
 	 * Launch the application.
@@ -83,7 +93,7 @@ public class MainScreen extends JFrame {
 		
 		setMinimumSize(new Dimension(600, 800));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 887, 679);
+		setBounds(100, 100, 1036, 800);
 		contentPane = new JPanel();
 		contentPane.setMinimumSize(new Dimension(600, 800));
 		contentPane.setBackground(new Color(255, 255, 255));
@@ -107,7 +117,7 @@ public class MainScreen extends JFrame {
 		jPanelProjectList.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		jPanelProjectList.setBackground(new Color(255, 255, 255));
 		
-		JPanel jPanel = new JPanel();
+		jPanel = new JPanel();
 		jPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		jPanel.setBackground(new Color(255, 255, 255));
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -151,7 +161,15 @@ public class MainScreen extends JFrame {
 				.addComponent(jScrollPanelProjects, GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
 		);
 		
-		JList jListProjects = new JList();
+		jListProjects = new JList<Project>();
+		jListProjects.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int projectIndex = jListProjects.getSelectedIndex();
+				Project project = (Project) projectsModel.get(projectIndex);
+				loadTasks(project.getId());
+			}
+		});
 		//jListProjects.setModel(projectModel);
 		jListProjects.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jListProjects.setSelectionBackground(new Color(0, 153, 102));
@@ -169,8 +187,20 @@ public class MainScreen extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				TaskDialogScreen taskDialogScreen = new TaskDialogScreen();
-				//taskDialogScreen.setProject(null);
-				taskDialogScreen.setVisible(rootPaneCheckingEnabled);
+				
+				int projectIndex = jListProjects.getSelectedIndex();
+				Project project = (Project) projectsModel.get(projectIndex);
+				taskDialogScreen.setProject(project);
+				
+				taskDialogScreen.setVisible(true);
+				
+				taskDialogScreen.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent e) {
+						int projectIndex = jListProjects.getSelectedIndex();
+						Project project = (Project) projectsModel.get(projectIndex);
+						loadTasks(project.getId());
+					}
+				});
 			}
 		});
 		jLabelTasksAdd.setIcon(new ImageIcon(MainScreen.class.getResource("/todoApp/resources/add.png")));
@@ -193,9 +223,9 @@ public class MainScreen extends JFrame {
 		);
 		jPanelTasks.setLayout(gl_jPanelTasks);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
-		JPanel jPanelEmptyList = new JPanel();
+		jPanelEmptyList = new JPanel();
 		tabbedPane.addTab("Sem tarefa", null, jPanelEmptyList, null);
 		jPanelEmptyList.setBackground(new Color(255, 255, 255));
 		
@@ -236,34 +266,47 @@ public class MainScreen extends JFrame {
 		);
 		jPanelEmptyList.setLayout(gl_jPanelEmptyList);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		scrollPane.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab("New tab", null, scrollPane, null);
+		tabbedPane.addTab("Com tarefas", null, scrollPane, null);
+		tabbedPane.setEnabledAt(1, true);
 		
 		jTableTasks = new JTable();
+		jTableTasks.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				int rowIndex = jTableTasks.rowAtPoint(evt.getPoint());
+				int columnIndex = jTableTasks.columnAtPoint(evt.getPoint());
+				Task task = taskModel.getTasks().get(rowIndex);
+				
+				switch (columnIndex) {
+				case 3:
+						taskController.update(task);
+					break;
+				case 4:
+					
+					break;
+				case 5:
+					taskController.removeById(task.getId());
+					taskModel.getTasks().remove(task);
+					
+					int projectIndex = jListProjects.getSelectedIndex();
+					Project project = (Project) projectsModel.get(projectIndex);
+					loadTasks(project.getId());
+					
+					break;
+				default:
+					break;
+				}
+				
+			}
+		});
+		jTableTasks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jTableTasks.setBackground(new Color(255, 255, 255));
 		jTableTasks.setGridColor(new Color(255, 255, 255));
 		jTableTasks.setRowHeight(50);
 		jTableTasks.setShowVerticalLines(false);
 		jTableTasks.setSelectionBackground(new Color(0, 255, 172));
-		/*jTableTasks.setModel(new DefaultTableModel(
-			new Object[][] {
-				{null, null, null, null},
-				{null, null, null, null},
-				{null, null, null, null},
-			},
-			new String[] {
-				"Nome", "Descri\u00E7\u00E3o", "Prazo", "Tarefa Concluida"
-			}
-		) {
-			private static final long serialVersionUID = 1L;
-			Class[] columnTypes = new Class[] {
-				String.class, String.class, String.class, Boolean.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});*/
 		scrollPane.setViewportView(jTableTasks);
 		GroupLayout gl_jPanel = new GroupLayout(jPanel);
 		gl_jPanel.setHorizontalGroup(
@@ -350,10 +393,11 @@ public class MainScreen extends JFrame {
 		);
 		jPanelToolBar.setLayout(gl_jPanelToolBar);
 		contentPane.setLayout(gl_contentPane);
+		
 		decorateTableTask();
 		initDataController();
 		initComponentsModel();
-		jListProjects.setModel(projectModel);
+		
 	}
 	
 	
@@ -363,8 +407,8 @@ public class MainScreen extends JFrame {
 		jTableTasks.getTableHeader().setBackground(new Color(0,153,102));
 		jTableTasks.getTableHeader().setForeground(new Color(0,153,102));
 		//Criando um sort automatico para as colunas da table
-		jTableTasks.setAutoCreateRowSorter(true);
-	}
+		//jTableTasks.setAutoCreateRowSorter(true);
+		}
 	
 	public void initDataController() {
 		projectController = new projectControler();
@@ -372,22 +416,61 @@ public class MainScreen extends JFrame {
 	}
 	
 	public void initComponentsModel() {
-		projectModel = new DefaultListModel(); 
+		projectsModel = new DefaultListModel<Project>(); 
 		loadProjects();
+		
+		taskModel = new TaskTableModel();
+		jTableTasks.setModel(taskModel);
+		//loadTasks(2);
+		
+		if (!projectsModel.isEmpty()) {
+            jListProjects.setSelectedIndex(0);
+            Project project = (Project) projectsModel.get(0);
+            loadTasks(project.getId());
+        }
+		
 	}
+	
+	public void loadTasks(int idProject) {
+		List<Task> tasks = taskController.getAll(idProject);
+		taskModel.setTasks(tasks);
+		showJTableTasks(!tasks.isEmpty());
+	}
+	
+	private void showJTableTasks(boolean isEmptyTable) {
+		tabbedPane.setEnabledAt( 1, false); 
+		tabbedPane.setEnabledAt( 0, true); 
+		tabbedPane.setSelectedIndex(0);
+		
+		if(isEmptyTable) {
+			tabbedPane.setEnabledAt( 1, true); 
+			tabbedPane.setEnabledAt( 0, false);  
+			tabbedPane.setSelectedIndex(1);
+			
+		}else {
+			//Sem tarefas
+			tabbedPane.setEnabledAt( 1, false); 
+			tabbedPane.setEnabledAt( 0, true); 
+			tabbedPane.setSelectedIndex(0);
+		}
+		 
+		
+    }
+
 	
 	public void loadProjects() {
 		List<Project> projects = projectControler.getAll();
 		
-		projectModel.clear();
+		projectsModel.clear();
 		
 		for (int i = 0; i < projects.size(); i++) {
 			Project project = projects.get(i);
 			
-			projectModel.addElement(project);
+			projectsModel.addElement(project);
+			
 		}
 		
+		jListProjects.setModel(projectsModel);
 		
 	}
-	
 }
