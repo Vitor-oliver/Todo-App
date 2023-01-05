@@ -17,21 +17,53 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.JList;
 import javax.swing.SwingConstants;
 import javax.swing.ListSelectionModel;
-import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import Controler.projectControler;
+import Controler.taskController;
+import Model.Project;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
 
 public class MainScreen extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTable jTableTasks;
+	
+	projectControler projectController;
+	taskController taskController;
+	
+	DefaultListModel projectModel;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Windows".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -48,6 +80,7 @@ public class MainScreen extends JFrame {
 	 * Create the frame.
 	 */
 	public MainScreen() {
+		
 		setMinimumSize(new Dimension(600, 800));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 887, 679);
@@ -119,15 +152,7 @@ public class MainScreen extends JFrame {
 		);
 		
 		JList jListProjects = new JList();
-		jListProjects.setModel(new AbstractListModel() {
-			String[] values = new String[] {"Item 1", "Item 2", "Item 3", "Item 4"};
-			public int getSize() {
-				return values.length;
-			}
-			public Object getElementAt(int index) {
-				return values[index];
-			}
-		});
+		//jListProjects.setModel(projectModel);
 		jListProjects.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		jListProjects.setSelectionBackground(new Color(0, 153, 102));
 		jListProjects.setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -140,6 +165,14 @@ public class MainScreen extends JFrame {
 		jLabelTesksTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
 		
 		JLabel jLabelTasksAdd = new JLabel("");
+		jLabelTasksAdd.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				TaskDialogScreen taskDialogScreen = new TaskDialogScreen();
+				//taskDialogScreen.setProject(null);
+				taskDialogScreen.setVisible(rootPaneCheckingEnabled);
+			}
+		});
 		jLabelTasksAdd.setIcon(new ImageIcon(MainScreen.class.getResource("/todoApp/resources/add.png")));
 		GroupLayout gl_jPanelTasks = new GroupLayout(jPanelTasks);
 		gl_jPanelTasks.setHorizontalGroup(
@@ -208,11 +241,12 @@ public class MainScreen extends JFrame {
 		tabbedPane.addTab("New tab", null, scrollPane, null);
 		
 		jTableTasks = new JTable();
+		jTableTasks.setBackground(new Color(255, 255, 255));
 		jTableTasks.setGridColor(new Color(255, 255, 255));
 		jTableTasks.setRowHeight(50);
 		jTableTasks.setShowVerticalLines(false);
 		jTableTasks.setSelectionBackground(new Color(0, 255, 172));
-		jTableTasks.setModel(new DefaultTableModel(
+		/*jTableTasks.setModel(new DefaultTableModel(
 			new Object[][] {
 				{null, null, null, null},
 				{null, null, null, null},
@@ -222,26 +256,29 @@ public class MainScreen extends JFrame {
 				"Nome", "Descri\u00E7\u00E3o", "Prazo", "Tarefa Concluida"
 			}
 		) {
+			private static final long serialVersionUID = 1L;
 			Class[] columnTypes = new Class[] {
 				String.class, String.class, String.class, Boolean.class
 			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
-		});
+		});*/
 		scrollPane.setViewportView(jTableTasks);
 		GroupLayout gl_jPanel = new GroupLayout(jPanel);
 		gl_jPanel.setHorizontalGroup(
 			gl_jPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_jPanel.createSequentialGroup()
 					.addGap(10)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 627, GroupLayout.PREFERRED_SIZE))
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+					.addGap(10))
 		);
 		gl_jPanel.setVerticalGroup(
 			gl_jPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_jPanel.createSequentialGroup()
 					.addGap(11)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 527, GroupLayout.PREFERRED_SIZE))
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
+					.addGap(11))
 		);
 		jPanel.setLayout(gl_jPanel);
 		
@@ -251,6 +288,19 @@ public class MainScreen extends JFrame {
 		jLabelProjectsTitle.setBackground(new Color(255, 255, 255));
 		
 		JLabel jLabelProjectsAdd = new JLabel("");
+		jLabelProjectsAdd.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				ProjectDialogScreen projectDialogScreen = new ProjectDialogScreen();
+				projectDialogScreen.setVisible(true);
+				
+				projectDialogScreen.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent e) {
+						loadProjects();
+					}
+				});
+			}
+		});
 		jLabelProjectsAdd.setIcon(new ImageIcon(MainScreen.class.getResource("/todoApp/resources/add.png")));
 		GroupLayout gl_jPanelProjects = new GroupLayout(jPanelProjects);
 		gl_jPanelProjects.setHorizontalGroup(
@@ -301,6 +351,9 @@ public class MainScreen extends JFrame {
 		jPanelToolBar.setLayout(gl_jPanelToolBar);
 		contentPane.setLayout(gl_contentPane);
 		decorateTableTask();
+		initDataController();
+		initComponentsModel();
+		jListProjects.setModel(projectModel);
 	}
 	
 	
@@ -308,9 +361,33 @@ public class MainScreen extends JFrame {
 		//Customizando o Header da table de tarefas
 		jTableTasks.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 		jTableTasks.getTableHeader().setBackground(new Color(0,153,102));
-		jTableTasks.getTableHeader().setForeground(new Color(255,255,255));
+		jTableTasks.getTableHeader().setForeground(new Color(0,153,102));
 		//Criando um sort automatico para as colunas da table
 		jTableTasks.setAutoCreateRowSorter(true);
+	}
+	
+	public void initDataController() {
+		projectController = new projectControler();
+		taskController = new taskController();
+	}
+	
+	public void initComponentsModel() {
+		projectModel = new DefaultListModel(); 
+		loadProjects();
+	}
+	
+	public void loadProjects() {
+		List<Project> projects = projectControler.getAll();
+		
+		projectModel.clear();
+		
+		for (int i = 0; i < projects.size(); i++) {
+			Project project = projects.get(i);
+			
+			projectModel.addElement(project);
+		}
+		
+		
 	}
 	
 }

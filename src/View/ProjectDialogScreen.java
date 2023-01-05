@@ -11,7 +11,11 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Graphics;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
@@ -19,16 +23,38 @@ import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 import java.awt.Dimension;
+import Controler.projectControler;
+import Model.Project;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ProjectDialogScreen extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private JTextField textField;
+	private JTextField jTextFieldName;
 
-	/**
-	 * Launch the application.
-	 */
+	projectControler controller;
+	
 	public static void main(String[] args) {
+		
+		try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Windows".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(MainScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+		
 		try {
 			ProjectDialogScreen dialog = new ProjectDialogScreen();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -48,86 +74,111 @@ public class ProjectDialogScreen extends JDialog {
 		contentPanel.setBackground(new Color(255, 255, 255));
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		JPanel panel = new JPanel();
-		panel.setBackground(new Color(0, 153, 102));
-		JPanel panel_1 = new JPanel();
-		panel_1.setBackground(new Color(255, 255, 255));
+		JPanel jPanelToolBar = new JPanel();
+		jPanelToolBar.setBackground(new Color(0, 153, 102));
+		JPanel jPanelProjec = new JPanel();
+		jPanelProjec.setBackground(new Color(255, 255, 255));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-				.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
-				.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+				.addComponent(jPanelProjec, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+				.addComponent(jPanelToolBar, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+					.addComponent(jPanelToolBar, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
+					.addComponent(jPanelProjec, GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
 		);
-		JLabel lblNewLabel_2 = new JLabel("Nome:");
-		lblNewLabel_2.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		JLabel jLabelName = new JLabel("Nome:");
+		jLabelName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
-		textField = new JTextField();
-		textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		textField.setColumns(10);
+		jTextFieldName = new JTextField();
+		jTextFieldName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		jTextFieldName.setColumns(10);
 		
-		JLabel lblNewLabel_3 = new JLabel("Descrição:");
-		lblNewLabel_3.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		JLabel jLabelDescription = new JLabel("Descrição:");
+		jLabelDescription.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setBorder(new LineBorder(new Color(0, 0, 0)));
-		textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-		gl_panel_1.setHorizontalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+		JTextArea jTextAreaDescription = new JTextArea();
+		jTextAreaDescription.setBorder(new LineBorder(new Color(0, 0, 0)));
+		jTextAreaDescription.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		GroupLayout gl_jPanelProjec = new GroupLayout(jPanelProjec);
+		gl_jPanelProjec.setHorizontalGroup(
+			gl_jPanelProjec.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_jPanelProjec.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-						.addComponent(textArea, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(textField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(lblNewLabel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(lblNewLabel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
+					.addGroup(gl_jPanelProjec.createParallelGroup(Alignment.TRAILING)
+						.addComponent(jTextAreaDescription, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jTextFieldName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jLabelName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jLabelDescription, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
 					.addContainerGap())
 		);
-		gl_panel_1.setVerticalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup()
+		gl_jPanelProjec.setVerticalGroup(
+			gl_jPanelProjec.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_jPanelProjec.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel_2)
+					.addComponent(jLabelName)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(jTextFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(lblNewLabel_3)
+					.addComponent(jLabelDescription)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textArea, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+					.addComponent(jTextAreaDescription, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
 					.addContainerGap())
 		);
-		panel_1.setLayout(gl_panel_1);
-		JLabel lblNewLabel = new JLabel("Projeto");
-		lblNewLabel.setForeground(new Color(255, 255, 255));
-		lblNewLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+		jPanelProjec.setLayout(gl_jPanelProjec);
+		JLabel jLabelToolBarTitle = new JLabel("Projeto");
+		jLabelToolBarTitle.setForeground(new Color(255, 255, 255));
+		jLabelToolBarTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
 		
-		JLabel lblNewLabel_1 = new JLabel("");
-		lblNewLabel_1.setIcon(new ImageIcon(ProjectDialogScreen.class.getResource("/todoApp/resources/check.png")));
-		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
+		JLabel jLabelToolBarSave = new JLabel("");
+		jLabelToolBarSave.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+				try {
+					Project project = new Project();
+					project.setName(jTextFieldName.getText());
+					project.setDescription(jTextAreaDescription.getText());
+					
+					controller.save(project);
+					JOptionPane.showMessageDialog(rootPane, "Projeto salvo com sucesso");
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(rootPane, ex.getMessage());
+				}
+				
+				dispose();
+			}
+
+			
+		});
+		jLabelToolBarSave.setIcon(new ImageIcon(ProjectDialogScreen.class.getResource("/todoApp/resources/check.png")));
+		GroupLayout gl_jPanelToolBar = new GroupLayout(jPanelToolBar);
+		gl_jPanelToolBar.setHorizontalGroup(
+			gl_jPanelToolBar.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_jPanelToolBar.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 344, GroupLayout.PREFERRED_SIZE)
+					.addComponent(jLabelToolBarTitle, GroupLayout.PREFERRED_SIZE, 344, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-					.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
+					.addComponent(jLabelToolBarSave, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
 		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel.createSequentialGroup()
+		gl_jPanelToolBar.setVerticalGroup(
+			gl_jPanelToolBar.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_jPanelToolBar.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(jLabelToolBarTitle, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addContainerGap())
-				.addComponent(lblNewLabel_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+				.addComponent(jLabelToolBarSave, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
 		);
-		panel.setLayout(gl_panel);
+		jPanelToolBar.setLayout(gl_jPanelToolBar);
 		contentPanel.setLayout(gl_contentPanel);
+		
+		controller = new projectControler();
+		
+		
+		
 	}
 }

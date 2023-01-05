@@ -14,7 +14,7 @@ public class taskController {
 	
 	public void save(Task task) {
 		
-		String sql = "INSERT INTO tasks (idProject, name, description, completed, notes, deadline, createdAt, updateAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO tasks (idProject, name, description, completed, notes, deadline, creatAt, updateAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		Connection connection = null;
 		PreparedStatement statement = null;
 		
@@ -39,7 +39,7 @@ public class taskController {
 	
 	public void update(Task task) {
 		
-		String sql = "UPDATE tasks SET idProject = ?, name = ?, description = ?, completed = ?, notes = ?, deadline = ?, createdAt = ?, updateAt = ?";
+		String sql = "UPDATE tasks SET idProject = ?, name = ?, description = ?, completed = ?, notes = ?, deadline = ?, creatAt = ?, updateAt = ?";
 		Connection connection = null;
 		PreparedStatement statement = null;
 		
@@ -118,7 +118,7 @@ public class taskController {
 				task.setNotes(resultSet.getString("notes"));
 				task.setCompleted(resultSet.getBoolean("completed"));
 				task.setDeadline(resultSet.getDate("deatline"));
-				task.setCreatedAt(resultSet.getDate("createdAt"));
+				task.setCreatedAt(resultSet.getDate("creatAt"));
 				task.setUpdatedAt(resultSet.getDate("updateAt"));
 				
 				tasks.add(task);

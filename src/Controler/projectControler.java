@@ -83,7 +83,7 @@ public class projectControler {
 		
 	}
 	
-	public List<Project> getAll(){
+	public static List<Project> getAll(){
 			
 			String sql = "SELECT * FROM projects";
 			Connection connection = null;
