@@ -27,6 +27,8 @@ import Controler.projectControler;
 import Controler.taskController;
 import Model.Project;
 import Model.Task;
+import util.ButtonColumnCellRenderer;
+import util.DeadlineColumnCellRenderer;
 import util.TaskTableModel;
 
 import java.awt.event.MouseAdapter;
@@ -226,7 +228,7 @@ public class MainScreen extends JFrame {
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
 		jPanelEmptyList = new JPanel();
-		tabbedPane.addTab("Sem tarefa", null, jPanelEmptyList, null);
+		tabbedPane.addTab("", null, jPanelEmptyList, null);
 		jPanelEmptyList.setBackground(new Color(255, 255, 255));
 		
 		JLabel jLabelEmptyListIcon = new JLabel("");
@@ -268,7 +270,7 @@ public class MainScreen extends JFrame {
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab("Com tarefas", null, scrollPane, null);
+		tabbedPane.addTab("", null, scrollPane, null);
 		tabbedPane.setEnabledAt(1, true);
 		
 		jTableTasks = new JTable();
@@ -394,9 +396,9 @@ public class MainScreen extends JFrame {
 		jPanelToolBar.setLayout(gl_jPanelToolBar);
 		contentPane.setLayout(gl_contentPane);
 		
-		decorateTableTask();
 		initDataController();
 		initComponentsModel();
+		decorateTableTask();
 		
 	}
 	
@@ -408,6 +410,10 @@ public class MainScreen extends JFrame {
 		jTableTasks.getTableHeader().setForeground(new Color(0,153,102));
 		//Criando um sort automatico para as colunas da table
 		//jTableTasks.setAutoCreateRowSorter(true);
+		
+		jTableTasks.getColumnModel().getColumn(2).setCellRenderer(new DeadlineColumnCellRenderer());
+		jTableTasks.getColumnModel().getColumn(4).setCellRenderer(new ButtonColumnCellRenderer("edit"));
+		jTableTasks.getColumnModel().getColumn(5).setCellRenderer(new ButtonColumnCellRenderer("delete"));
 		}
 	
 	public void initDataController() {

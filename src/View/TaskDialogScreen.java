@@ -1,9 +1,9 @@
 package View;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 
-import javax.swing.JButton;
+
+
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -40,6 +40,10 @@ public class TaskDialogScreen extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField jTextFieldName;
+	private JLabel jLabeNameError;
+	private JLabel jLabelDeadline;
+	private JLabel jLabeDeadLineError;
+	private JFormattedTextField jFormatedTextFieldDeadline;
 	
 	taskController controller;
 	Project project;
@@ -80,7 +84,7 @@ public class TaskDialogScreen extends JDialog {
 	 */
 	public TaskDialogScreen() {
 		setMinimumSize(new Dimension(450, 550));
-		setBounds(100, 100, 450, 561);
+		setBounds(100, 100, 450, 624);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBackground(new Color(255, 255, 255));
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -107,11 +111,13 @@ public class TaskDialogScreen extends JDialog {
 		jTextFieldName.setColumns(10);
 		JLabel jLabelDescription = new JLabel("Descrição:");
 		JTextArea jTextAreaDescription = new JTextArea();
+		jTextAreaDescription.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		jTextAreaDescription.setBorder(new LineBorder(new Color(0, 0, 0)));
-		JLabel jLabelDeadline = new JLabel("Prazo: ");
+		jLabelDeadline = new JLabel("Prazo: ");
 		JLabel jLabelNotes = new JLabel("Notas: ");
 		
 		JTextArea jTextAreaNotes = new JTextArea();
+		jTextAreaNotes.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		jTextAreaNotes.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		MaskFormatter mascaraData = null;
@@ -123,8 +129,16 @@ public class TaskDialogScreen extends JDialog {
             System.err.println("Erro na formatação: " + excp.getMessage());
 		}
 		
-		JFormattedTextField jFormatedTextFieldDeadline = new JFormattedTextField(mascaraData);
+		jFormatedTextFieldDeadline = new JFormattedTextField(mascaraData);
 		jFormatedTextFieldDeadline.setBounds(150,160,100,20); 
+		
+		jLabeNameError = new JLabel("Campo de nome é obrigatório");
+		jLabeNameError.setForeground(new Color(255, 0, 0));
+		jLabeNameError.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		
+		jLabeDeadLineError = new JLabel("Campo de prazo é obrigatório");
+		jLabeDeadLineError.setForeground(new Color(255, 0, 0));
+		jLabeDeadLineError.setFont(new Font("Segoe UI", Font.BOLD, 14));
         
 		GroupLayout gl_jPanelTask = new GroupLayout(jPanelTask);
 		gl_jPanelTask.setHorizontalGroup(
@@ -133,13 +147,15 @@ public class TaskDialogScreen extends JDialog {
 					.addContainerGap()
 					.addGroup(gl_jPanelTask.createParallelGroup(Alignment.LEADING)
 						.addComponent(jTextAreaNotes, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(jTextAreaDescription, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
 						.addComponent(jTextFieldName, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
 						.addComponent(jLabelName, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(jLabelDescription, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(jLabelDeadline, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
 						.addComponent(jLabelNotes, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-						.addComponent(jFormatedTextFieldDeadline, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
+						.addComponent(jFormatedTextFieldDeadline, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jLabelDeadline, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jTextAreaDescription, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jLabelDescription, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jLabeNameError, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+						.addComponent(jLabeDeadLineError, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_jPanelTask.setVerticalGroup(
@@ -149,18 +165,22 @@ public class TaskDialogScreen extends JDialog {
 					.addComponent(jLabelName)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(jTextFieldName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(3)
+					.addComponent(jLabeNameError)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(jLabelDescription)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(jTextAreaDescription, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(jLabelDeadline)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(jFormatedTextFieldDeadline, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(11)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(jLabeDeadLineError)
+					.addPreferredGap(ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
 					.addComponent(jLabelNotes)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(jTextAreaNotes, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
+					.addComponent(jTextAreaNotes, GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		jPanelTask.setLayout(gl_jPanelTask);
@@ -172,25 +192,37 @@ public class TaskDialogScreen extends JDialog {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
 				try {
-					Task task = new Task();
-					task.setIdProject(project.getId());
-					task.setName(jTextFieldName.getText());
-					task.setDescription(jTextAreaDescription.getText());
-					task.setNotes(jTextAreaNotes.getText());
-					task.setCompleted(false);
-					
-					SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-					Date deadLine = null;
-					
-					deadLine = dateFormat.parse(jFormatedTextFieldDeadline.getText());
-					task.setDeadline(deadLine);
-					controller.save(task);
-					JOptionPane.showMessageDialog(rootPane, "Tarefa salva com sucesso");
+					if (!jTextFieldName.getText().isEmpty() && !jFormatedTextFieldDeadline.getText().isEmpty()) {
+						Task task = new Task();
+						task.setIdProject(project.getId());
+						task.setName(jTextFieldName.getText());
+						task.setDescription(jTextAreaDescription.getText());
+						task.setNotes(jTextAreaNotes.getText());
+						task.setCompleted(false);
+						
+						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+						Date deadLine = null;
+						
+						deadLine = dateFormat.parse(jFormatedTextFieldDeadline.getText());
+						task.setDeadline(deadLine);
+						controller.save(task);
+						JOptionPane.showMessageDialog(rootPane, "Tarefa salva com sucesso");
+						
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(rootPane, "Os campos nome e prazo são obrigatorios, preencha e depois salve");
+						/*if (jTextFieldName.getText().isEmpty()) {
+							jLabeNameError.setVisible(true);
+						}
+						if (jFormatedTextFieldDeadline.getText().isEmpty()) {
+							jLabeDeadLineError.setVisible(true);
+						}*/
+					}
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(rootPane, e.getMessage());
 				}
 				
-				dispose();
+				
 			}
 		});
 		jLabelToolBarSave.setIcon(new ImageIcon(TaskDialogScreen.class.getResource("/todoApp/resources/check.png")));
@@ -215,11 +247,15 @@ public class TaskDialogScreen extends JDialog {
 		contentPanel.setLayout(gl_contentPanel);
 	
 		controller = new taskController();
+		hideErrorField();
 	}
 
 	public void setProject(Project project) {
 		this.project = project;
 	}
 	
-		
+	public void hideErrorField() {
+		jLabeDeadLineError.setVisible(false);
+		jLabeNameError.setVisible(false);
+	}
 }
