@@ -280,13 +280,18 @@ public class MainScreen extends JFrame {
 				int rowIndex = jTableTasks.rowAtPoint(evt.getPoint());
 				int columnIndex = jTableTasks.columnAtPoint(evt.getPoint());
 				Task task = taskModel.getTasks().get(rowIndex);
+				TaskDialogScreen taskDialogScreen = new TaskDialogScreen();
 				
 				switch (columnIndex) {
 				case 3:
 						taskController.update(task);
 					break;
 				case 4:
+					//Alterar para pegar a task 
 					
+					taskDialogScreen.setTask(task);
+					
+					taskDialogScreen.setVisible(true);
 					break;
 				case 5:
 					taskController.removeById(task.getId());

@@ -44,9 +44,12 @@ public class TaskDialogScreen extends JDialog {
 	private JLabel jLabelDeadline;
 	private JLabel jLabeDeadLineError;
 	private JFormattedTextField jFormatedTextFieldDeadline;
+	private JTextArea jTextAreaDescription;
+	private JTextArea jTextAreaNotes;
 	
 	taskController controller;
 	Project project;
+	Task task;
 
 	/**
 	 * Launch the application.
@@ -110,13 +113,13 @@ public class TaskDialogScreen extends JDialog {
 		jTextFieldName = new JTextField();
 		jTextFieldName.setColumns(10);
 		JLabel jLabelDescription = new JLabel("Descrição:");
-		JTextArea jTextAreaDescription = new JTextArea();
+		jTextAreaDescription = new JTextArea();
 		jTextAreaDescription.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		jTextAreaDescription.setBorder(new LineBorder(new Color(0, 0, 0)));
 		jLabelDeadline = new JLabel("Prazo: ");
 		JLabel jLabelNotes = new JLabel("Notas: ");
 		
-		JTextArea jTextAreaNotes = new JTextArea();
+		jTextAreaNotes = new JTextArea();
 		jTextAreaNotes.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		jTextAreaNotes.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
@@ -124,7 +127,7 @@ public class TaskDialogScreen extends JDialog {
 		
 		try {
 			mascaraData = new MaskFormatter("##/##/####");
-	        mascaraData.setPlaceholderCharacter('_');
+	        //mascaraData.setPlaceholderCharacter('_');
 		} catch (ParseException excp) {
             System.err.println("Erro na formatação: " + excp.getMessage());
 		}
@@ -133,10 +136,12 @@ public class TaskDialogScreen extends JDialog {
 		jFormatedTextFieldDeadline.setBounds(150,160,100,20); 
 		
 		jLabeNameError = new JLabel("Campo de nome é obrigatório");
+		jLabeNameError.setVisible(false);
 		jLabeNameError.setForeground(new Color(255, 0, 0));
 		jLabeNameError.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		
 		jLabeDeadLineError = new JLabel("Campo de prazo é obrigatório");
+		jLabeDeadLineError.setVisible(false);
 		jLabeDeadLineError.setForeground(new Color(255, 0, 0));
 		jLabeDeadLineError.setFont(new Font("Segoe UI", Font.BOLD, 14));
         
@@ -191,35 +196,64 @@ public class TaskDialogScreen extends JDialog {
 		jLabelToolBarSave.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				try {
-					if (!jTextFieldName.getText().isEmpty() && !jFormatedTextFieldDeadline.getText().isEmpty()) {
-						Task task = new Task();
-						task.setIdProject(project.getId());
-						task.setName(jTextFieldName.getText());
-						task.setDescription(jTextAreaDescription.getText());
-						task.setNotes(jTextAreaNotes.getText());
-						task.setCompleted(false);
-						
-						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-						Date deadLine = null;
-						
-						deadLine = dateFormat.parse(jFormatedTextFieldDeadline.getText());
-						task.setDeadline(deadLine);
-						controller.save(task);
-						JOptionPane.showMessageDialog(rootPane, "Tarefa salva com sucesso");
-						
-						dispose();
-					} else {
-						JOptionPane.showMessageDialog(rootPane, "Os campos nome e prazo são obrigatorios, preencha e depois salve");
-						/*if (jTextFieldName.getText().isEmpty()) {
-							jLabeNameError.setVisible(true);
+				if (task != null ) {
+					
+					try {
+						if(!jTextFieldName.getText().isEmpty() && !jFormatedTextFieldDeadline.getText().isEmpty()) {
+							task.setName(jTextFieldName.getText());
+							task.setDescription(jTextAreaDescription.getText());
+							task.setNotes(jTextAreaNotes.getText());
+							
+							controller.update(task);
+							JOptionPane.showMessageDialog(rootPane, "Tarefa atualizada com sucesso");
+							
+							dispose();
+							
+							//deadline
+						}else {
+							JOptionPane.showMessageDialog(rootPane, "Os campos nome e prazo são obrigatorios, preencha e depois salve");
+							if (jTextFieldName.getText().isEmpty()) {
+								jLabeNameError.setVisible(true);
+							}
+							if (jFormatedTextFieldDeadline.getText().isEmpty()) {
+								jLabeDeadLineError.setVisible(true);
+							}
 						}
-						if (jFormatedTextFieldDeadline.getText().isEmpty()) {
-							jLabeDeadLineError.setVisible(true);
-						}*/
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(rootPane, e.getMessage());
 					}
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(rootPane, e.getMessage());
+					
+				} else {
+					try {
+						if (!jTextFieldName.getText().isEmpty() && !jFormatedTextFieldDeadline.getText().isEmpty()) {
+							Task task = new Task();
+							task.setIdProject(project.getId());
+							task.setName(jTextFieldName.getText());
+							task.setDescription(jTextAreaDescription.getText());
+							task.setNotes(jTextAreaNotes.getText());
+							task.setCompleted(false);
+							
+							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+							Date deadLine = null;
+							
+							deadLine = dateFormat.parse(jFormatedTextFieldDeadline.getText());
+							task.setDeadline(deadLine);
+							controller.save(task);
+							JOptionPane.showMessageDialog(rootPane, "Tarefa salva com sucesso");
+							
+							dispose();
+						} else {
+							JOptionPane.showMessageDialog(rootPane, "Os campos nome e prazo são obrigatorios, preencha e depois salve");
+							if (jTextFieldName.getText().isEmpty()) {
+								jLabeNameError.setVisible(true);
+							}
+							if (jFormatedTextFieldDeadline.getText().isEmpty()) {
+								jLabeDeadLineError.setVisible(true);
+							}
+						}
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(rootPane, e.getMessage());
+					}
 				}
 				
 				
@@ -254,8 +288,16 @@ public class TaskDialogScreen extends JDialog {
 		this.project = project;
 	}
 	
+	public void setTask(Task task) {
+		this.task = task;
+		
+		jTextFieldName.setText(task.getName());
+		jTextAreaDescription.setText(task.getDescription());
+		//Transformar de data sql para data java 
+		jFormatedTextFieldDeadline.setText(task.getDeadline().toString());
+		jTextAreaNotes.setText(task.getNotes());
+	}
+	
 	public void hideErrorField() {
-		jLabeDeadLineError.setVisible(false);
-		jLabeNameError.setVisible(false);
 	}
 }
